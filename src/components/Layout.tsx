@@ -9,6 +9,7 @@ import React from 'react';
       Bell,
       Wrench
     } from 'lucide-react';
+    import { getUserName, logout } from '../auth/authUtils';
 
     interface LayoutProps {
       children: React.ReactNode;
@@ -31,6 +32,11 @@ import React from 'react';
       ];
 
       const navItems = role === 'tenant' ? tenantNav : maintenanceNav;
+
+      const handleLogout = () => {
+        logout();
+        navigate('/login');
+      };
 
       return (
         <div className="flex min-h-screen bg-slate-50">
@@ -65,7 +71,7 @@ import React from 'react';
 
             <div className="p-4 border-t border-slate-100">
               <button 
-                onClick={() => navigate('/login')}
+                onClick={handleLogout}
                 className="flex items-center gap-3 px-4 py-3 w-full text-rose-600 hover:bg-rose-50 rounded-lg transition-colors font-medium"
               >
                 <LogOut size={20} />
@@ -88,7 +94,7 @@ import React from 'react';
                 <div className="h-8 w-px bg-slate-200 mx-2" />
                 <div className="flex items-center gap-3">
                   <div className="text-right hidden sm:block">
-                    <p className="text-sm font-semibold text-slate-900">John Doe</p>
+                    <p className="text-sm font-semibold text-slate-900">{getUserName() || 'User'}</p>
                     <p className="text-xs text-slate-500 capitalize">{role}</p>
                   </div>
                   <div className="h-10 w-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600">
