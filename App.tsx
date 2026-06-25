@@ -13,6 +13,8 @@ import RequestHistory from './src/pages/tenant/RequestHistory';
 import MaintenanceDashboard from './src/pages/maintenance/MaintenanceDashboard';
 import AllRequests from './src/pages/maintenance/AllRequests';
 import MaintenanceRequestDetails from './src/pages/maintenance/MaintenanceRequestDetails';
+import PendingApprovals from './src/pages/maintenance/PendingApprovals';
+import TenantManagement from './src/pages/maintenance/TenantManagement';
 import NotFound from './src/pages/NotFound';
 
 import ProtectedRoute from './src/auth/ProtectedRoute';
@@ -97,6 +99,26 @@ const App: React.FC = () => {
                 <ProtectedRoute>
                   <RoleProtectedRoute role="MAINTENANCE">
                     <MaintenanceRequestDetails />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/maintenance/pending-approvals"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute role="MAINTENANCE">
+                    <PendingApprovals />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/maintenance/tenants"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute role="MAINTENANCE">
+                    <TenantManagement />
                   </RoleProtectedRoute>
                 </ProtectedRoute>
               }

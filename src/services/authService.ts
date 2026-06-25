@@ -55,11 +55,12 @@ export async function login(payload: LoginRequest) {
 export async function register(payload: RegisterRequest) {
   const res = await api.post<ApiResponse<AuthResponse>>('/api/auth/register', payload);
 
-  if (!res.data?.data?.token || !res.data?.data?.user) {
+  // Registration no longer returns a token — the account is PENDING approval.
+  // We just need the call to succeed (2xx).
+  if (!res.data?.success) {
     throw new Error(res.data?.message || 'Registration failed');
   }
 
-  persistAuth(res.data.data);
   return res.data.data;
 }
 

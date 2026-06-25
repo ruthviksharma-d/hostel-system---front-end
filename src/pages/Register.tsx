@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Wrench, User, Mail, Lock } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Wrench, User, Mail, Lock, Clock } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { register as registerApi } from '../services/authService';
 
 export default function Register() {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,8 +20,7 @@ export default function Register() {
     setLoading(true);
     try {
       await registerApi({ name, email, password, role: 'TENANT' });
-      toast.success('Account created successfully!');
-      navigate('/tenant/dashboard');
+      setRegistered(true);
     } catch (err: any) {
       const msg = err?.response?.data?.message || err?.message || 'Registration failed';
       toast.error(msg);
@@ -29,6 +28,27 @@ export default function Register() {
       setLoading(false);
     }
   };
+
+  if (registered) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-6 py-12">
+        <div className="max-w-md w-full text-center">
+          <div className="inline-flex items-center justify-center p-4 bg-amber-100 rounded-full mb-6">
+            <Clock size={36} className="text-amber-600" />
+          </div>
+          <h1 className="font-serif text-3xl font-bold text-slate-900 mb-3">Registration Submitted</h1>
+          <p className="text-slate-600 mb-2">Your account has been created and is <strong>awaiting approval</strong> from the hostel maintenance team.</p>
+          <p className="text-slate-500 text-sm mb-8">You'll be able to log in once a maintenance staff member approves your account.</p>
+          <Link
+            to="/login"
+            className="inline-block bg-slate-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-slate-800 transition-colors"
+          >
+            Back to Login
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-6 py-12">
@@ -42,6 +62,11 @@ export default function Register() {
         </div>
 
         <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-200">
+          {/* Approval notice */}
+          <div className="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+            Your account will need to be approved by the hostel team before you can log in.
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
@@ -91,7 +116,7 @@ export default function Register() {
               disabled={loading}
               className="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold hover:bg-slate-800 hover:scale-[1.01] active:scale-[0.99] transition-all shadow-lg shadow-slate-900/20 mt-4 disabled:opacity-60 disabled:hover:scale-100"
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? 'Submitting...' : 'Request Account'}
             </button>
           </form>
 

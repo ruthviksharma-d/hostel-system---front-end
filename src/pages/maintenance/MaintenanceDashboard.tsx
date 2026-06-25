@@ -10,21 +10,28 @@ import {
   AlertCircle,
   ChevronRight,
   PackageCheck,
+  UserCheck,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { getAllRequests, type RequestResponse } from '../../services/requestService';
+import { getPendingCount } from '../../services/tenantService';
 import { countByStatus, formatDate, requestCode } from '../../utils/requestFormatting';
 
 export default function MaintenanceDashboard() {
   const navigate = useNavigate();
   const [requests, setRequests] = useState<RequestResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pendingCount, setPendingCount] = useState<number | null>(null);
 
   useEffect(() => {
     getAllRequests({ page: 0, size: 100, sortBy: 'createdAt', sortDir: 'desc' })
       .then((page) => setRequests(page.content))
       .catch((err: any) => toast.error(err?.response?.data?.message || err?.message || 'Failed to load requests'))
       .finally(() => setLoading(false));
+
+    getPendingCount()
+      .then(setPendingCount)
+      .catch(() => {});
   }, []);
 
   const stats = useMemo(() => countByStatus(requests), [requests]);
@@ -37,6 +44,27 @@ export default function MaintenanceDashboard() {
           <h1 className="text-3xl font-bold text-slate-900">Maintenance Overview</h1>
           <p className="text-slate-500 mt-1">Manage and track all hostel maintenance requests.</p>
         </div>
+
+        {/* Pending approvals alert banner */}
+        {pendingCount !== null && pendingCount > 0 && (
+          <button
+            onClick={() => navigate('/maintenance/pending-approvals')}
+            className="w-full flex items-center justify-between p-4 bg-amber-50 border border-amber-200 rounded-2xl hover:bg-amber-100 transition-colors text-left"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-amber-500 rounded-lg">
+                <UserCheck size={18} className="text-white" />
+              </div>
+              <div>
+                <p className="font-bold text-amber-900">
+                  {pendingCount} tenant{pendingCount !== 1 ? 's' : ''} awaiting approval
+                </p>
+                <p className="text-sm text-amber-700">Review and approve new tenant registrations</p>
+              </div>
+            </div>
+            <ChevronRight size={20} className="text-amber-600 shrink-0" />
+          </button>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <StatCard title="Total" value={stats.total} icon={ClipboardList} color="bg-slate-900" />
