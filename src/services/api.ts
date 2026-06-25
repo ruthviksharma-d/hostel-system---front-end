@@ -16,9 +16,16 @@ function getJwtToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
 }
 
+// Auth endpoints don't need (and shouldn't receive) a stale JWT
+const AUTH_ENDPOINTS = ['/api/auth/login', '/api/auth/register'];
+
 function setAuthorizationHeader(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig {
   const token = getJwtToken();
   if (!token) return config;
+
+  // Never send a stored JWT on login/register — a stale token causes the
+  // JWT filter to query the DB before the controller even runs.
+  if (AUTH_ENDPOINTS.some(ep => config.url?.includes(ep))) return config;
 
   config.headers = {
     ...(config.headers as Record<string, unknown> | undefined),
